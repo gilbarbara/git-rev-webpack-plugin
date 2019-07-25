@@ -1,0 +1,78 @@
+{
+  "name": "git-rev-webpack-plugin",
+  "version": "0.0.1",
+  "description": "Webpack plugin to use git branch, hash and tag as substitutions for file names",
+  "author": "Gil Barbara <gilbarbara@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gilbarbara/git-rev-webpack-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gilbarbara/git-rev-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/gilbarbara/git-rev-webpack-plugin#readme",
+  "keywords": [
+    "webpack",
+    "git",
+    "branch",
+    "hash",
+    "tag"
+  ],
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "types": "lib/index.d.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.0",
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.6.8",
+    "@types/webpack": "^4.32.1",
+    "bundlesize": "^0.18.0",
+    "file-loader": "^4.1.0",
+    "fs-extra": "^8.1.0",
+    "husky": "^3.0.1",
+    "is-ci-cli": "^1.1.1",
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.3",
+    "webpack": "^4.37.0"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run build:ts",
+    "build:ts": "tsc --outDir lib",
+    "watch": "npm run build:ts -- -w",
+    "clean": "rimraf lib",
+    "test": "is-ci \"test:coverage\" \"test:watch\"",
+    "test:coverage": "jest --coverage --bail",
+    "test:watch": "jest --watch --verbose",
+    "lint": "tslint 'src/**/*.ts'  'test/**/*.ts' 'tools/**/*.ts'",
+    "format": "prettier \"**/*.{js,jsx,json,yml,yaml,css,less,scss,ts,tsx,md,graphql,mdx}\" --write",
+    "validate": "npm run lint && npm run test:coverage && npm run build && npm run bundlesize",
+    "bundlesize": "bundlesize",
+    "prepublishOnly": "npm run validate"
+  },
+  "prettier": {
+    "jsxBracketSameLine": false,
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "bundlesize": [
+    {
+      "path": "./lib/index.js",
+      "maxSize": "1 kB"
+    }
+  ],
+  "husky": {
+    "hooks": {
+      "post-merge": "ts-node tools update",
+      "pre-commit": "ts-node tools has-commits && npm run validate"
+    }
+  }
+}
