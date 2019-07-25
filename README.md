@@ -1,5 +1,7 @@
 # git-rev-webpack-plugin
 
+[![NPM version](https://badge.fury.io/js/git-rev-webpack-plugin.svg)](https://www.npmjs.com/package/git-rev-webpack-plugin) [![build status](https://travis-ci.org/gilbarbara/git-rev-webpack-plugin.svg)](https://travis-ci.org/gilbarbara/git-rev-webpack-plugin) [![Maintainability](https://api.codeclimate.com/v1/badges/dd85085bfd69c59693ff/maintainability)](https://codeclimate.com/github/gilbarbara/git-rev-webpack-plugin/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/dd85085bfd69c59693ff/test_coverage)](https://codeclimate.com/github/gilbarbara/git-rev-webpack-plugin/test_coverage)
+
 [Webpack](http://webpack.github.io/) plugin for using git branch, hash (from the last commit) and tag as substitutions in output.filename and output.chunkFilename.
 
 ## Getting Started
