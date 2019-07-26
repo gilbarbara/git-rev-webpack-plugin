@@ -1,7 +1,10 @@
 {
   "extends": "../tsconfig",
   "compilerOptions": {
-    "module": "esnext"
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "noImplicitAny": false
   },
   "include": ["**/*"]
 }

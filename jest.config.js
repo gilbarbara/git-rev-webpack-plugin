@@ -3,10 +3,15 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.ts'],
   coverageThreshold: {
     global: {
-      branches: 95,
-      functions: 95,
-      lines: 95,
-      statements: 95,
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+  },
+  globals: {
+    'ts-jest': {
+      tsConfig: 'test/tsconfig.json',
     },
   },
   moduleDirectories: ['node_modules', 'src', './'],

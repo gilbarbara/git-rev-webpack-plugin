@@ -39,7 +39,7 @@ describe('GitRevPlugin', () => {
   it('should handle missing git tree', () => {
     const { log } = console;
     console.log = jest.fn();
-    const gitRevPlugin = new GitRevPlugin();
+    const gitRevPlugin = new GitRevPlugin({ path: '../../' });
 
     expect(gitRevPlugin.branch()).toBe('');
     expect(gitRevPlugin.hash()).toBe('');
@@ -62,7 +62,7 @@ describe('GitRevPlugin', () => {
       }),
     ];
 
-    webpack(config, (error, stats) => {
+    webpack(config, (error: Error, stats: webpack.Stats) => {
       // Stats Object
       if (error || stats.hasErrors()) {
         console.log(error);

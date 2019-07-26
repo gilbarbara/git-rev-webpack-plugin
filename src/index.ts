@@ -1,21 +1,7 @@
-import { runGit } from './utils';
+import { IOptions, IVariables, runGit } from './utils';
+import { Compiler } from 'webpack';
 
-export interface IOptions {
-  path?: string;
-  branchCommand?: string;
-  hashCommand?: string;
-  tagCommand?: string;
-}
-
-export interface IMembers {
-  path?: string;
-  branchCommand: string;
-  hashCommand: string;
-  tagCommand: string;
-  substitutionTypes: string[];
-}
-
-function GitRevPlugin(this: IMembers, options: IOptions = {}) {
+function GitRevPlugin(this: IVariables, options: IOptions = {}) {
   this.path = options.path;
 
   this.branchCommand = options.branchCommand || 'rev-parse --abbrev-ref HEAD';
@@ -25,14 +11,14 @@ function GitRevPlugin(this: IMembers, options: IOptions = {}) {
   this.substitutionTypes = ['branch', 'hash', 'tag'];
 }
 
-GitRevPlugin.prototype.apply = function(compiler) {
-  compiler.hooks.emit.tapAsync('GitRevPlugin', (compilation, callback) => {
+GitRevPlugin.prototype.apply = function(compiler: Compiler) {
+  compiler.hooks.emit.tapAsync('GitRevPlugin', (compilation, callback: () => any) => {
     const { assets } = compilation;
 
     Object.keys(assets).forEach(d => {
       let key = d;
 
-      this.substitutionTypes.forEach(type => {
+      this.substitutionTypes.forEach((type: string) => {
         if (key.indexOf(`[git-${type}]`) >= 0) {
           const value = runGit(this.path, this[`${type}Command`]);
           const regex = new RegExp(`\\[git-${type}\\]`, 'gi');
@@ -54,7 +40,7 @@ GitRevPlugin.prototype.branch = function() {
   return runGit(this.path, this.branchCommand);
 };
 
-GitRevPlugin.prototype.hash = function(long = false) {
+GitRevPlugin.prototype.hash = function(long: boolean = false) {
   return runGit(this.path, long ? this.hashCommand.replace(' --short', '') : this.hashCommand);
 };
 
@@ -62,4 +48,4 @@ GitRevPlugin.prototype.tag = function() {
   return runGit(this.path, this.tagCommand);
 };
 
-export default GitRevPlugin;
+export = GitRevPlugin;

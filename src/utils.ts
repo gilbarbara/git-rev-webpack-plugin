@@ -1,25 +1,41 @@
 import { execSync } from 'child_process';
-import { join } from 'path';
 
-export function runGit(cwd, command) {
+export interface IOptions {
+  path?: string;
+  branchCommand?: string;
+  hashCommand?: string;
+  tagCommand?: string;
+}
+
+export interface IVariables {
+  path?: string;
+  branchCommand: string;
+  hashCommand: string;
+  tagCommand: string;
+  substitutionTypes: string[];
+}
+
+interface IExecOptions {
+  cwd?: string;
+}
+
+export function runGit(cwd: string | undefined, command: string) {
   const gitCommand = ['git', command].join(' ');
-  const execOptions = { encoding: 'utf8', cwd };
+  const execOptions: IExecOptions = {};
 
   /* istanbul ignore else */
   if (cwd) {
-    execOptions.cwd = join(cwd, '.git');
+    execOptions.cwd = cwd;
   }
 
-  const insideGit = execSync('git rev-parse --is-inside-git-dir', execOptions);
-  const insideWorkTree = execSync('git rev-parse --is-inside-work-tree', { ...execOptions, cwd });
+  try {
+    execSync('git rev-parse --is-inside-work-tree', execOptions);
+    const output = execSync(gitCommand, execOptions);
 
-  if (insideGit.indexOf('true') === -1 || insideWorkTree.indexOf('true') === -1) {
+    return output.toString().replace(/[\s\r\n]+$/, '');
+  } catch (error) {
     // tslint:disable-next-line:no-console
     console.log('GitRevPlugin: project is not under git');
     return '';
   }
-
-  const output = execSync(gitCommand, execOptions);
-
-  return output.toString().replace(/[\s\r\n]+$/, '');
 }
