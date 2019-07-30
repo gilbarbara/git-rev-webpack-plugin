@@ -12,7 +12,6 @@ export interface IVariables {
   branchCommand: string;
   hashCommand: string;
   tagCommand: string;
-  substitutionTypes: string[];
 }
 
 interface IExecOptions {

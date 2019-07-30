@@ -7,32 +7,27 @@ function GitRevPlugin(this: IVariables, options: IOptions = {}) {
   this.branchCommand = options.branchCommand || 'rev-parse --abbrev-ref HEAD';
   this.hashCommand = options.hashCommand || 'rev-parse --short HEAD';
   this.tagCommand = options.tagCommand || 'describe --abbrev=0 --tags';
-
-  this.substitutionTypes = ['branch', 'hash', 'tag'];
 }
 
 GitRevPlugin.prototype.apply = function(compiler: Compiler) {
-  compiler.hooks.emit.tapAsync('GitRevPlugin', (compilation, callback: () => any) => {
-    const { assets } = compilation;
+  const REGEXP_BRANCH = /\[git-branch\]/gi;
+  const REGEXP_HASH = /\[git-hash\]/gi;
+  const REGEXP_TAG = /\[git-tag\]/gi;
 
-    Object.keys(assets).forEach(d => {
-      let key = d;
+  const currentBranch = runGit(this.path, this.branchCommand);
+  const currentHash = runGit(this.path, this.hashCommand);
+  const currentTag = runGit(this.path, this.tagCommand);
 
-      this.substitutionTypes.forEach((type: string) => {
-        if (key.indexOf(`[git-${type}]`) >= 0) {
-          const value = runGit(this.path, this[`${type}Command`]);
-          const regex = new RegExp(`\\[git-${type}\\]`, 'gi');
-          const nextKey = key.replace(regex, value);
+  compiler.hooks.compilation.tap('GitRevPlugin', compilation => {
+    const { mainTemplate } = compilation;
 
-          assets[nextKey] = assets[key];
-          delete assets[key];
-
-          key = nextKey;
-        }
-      });
+    // @ts-ignore
+    mainTemplate.hooks.assetPath.tap('GitRevPlugin', path => {
+      return path
+        .replace(REGEXP_BRANCH, currentBranch)
+        .replace(REGEXP_HASH, currentHash)
+        .replace(REGEXP_TAG, currentTag);
     });
-
-    callback();
   });
 };
 
