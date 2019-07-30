@@ -1,8 +1,10 @@
 /* tslint:disable:no-console */
+import { readFileSync } from 'fs';
 import { copySync } from 'fs-extra/lib/copy-sync';
 import { emptyDirSync } from 'fs-extra/lib/empty';
 import { pathExistsSync } from 'fs-extra/lib/path-exists';
 import { removeSync } from 'fs-extra/lib/remove';
+
 import { join } from 'path';
 import webpack from 'webpack';
 
@@ -60,7 +62,7 @@ describe('GitRevPlugin', () => {
       new GitRevPlugin({
         path: targetProject,
       }),
-    ];
+    ].concat(config.plugins);
 
     webpack(config, (error: Error, stats: webpack.Stats) => {
       // Stats Object
@@ -68,9 +70,17 @@ describe('GitRevPlugin', () => {
         console.log(error);
       }
 
+      const html = readFileSync(join(targetBuild, 'index.html'), 'utf8');
+
       expect(pathExistsSync(join(targetBuild, 'main-master-9a15b3b-v2.0.0-beta.js'))).toBeTruthy();
       expect(
         pathExistsSync(join(targetBuild, 'outside-resource-master-v2.0.0-beta.txt')),
+      ).toBeTruthy();
+      expect(pathExistsSync(join(targetBuild, 'index.html'))).toBeTruthy();
+      expect(
+        html.indexOf(
+          'http://cdn.com/assets/master/v2.0.0-beta/9a15b3b/main-master-9a15b3b-v2.0.0-beta.js',
+        ) >= 0,
       ).toBeTruthy();
 
       done();
