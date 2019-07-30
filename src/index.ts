@@ -22,8 +22,10 @@ GitRevPlugin.prototype.apply = function(compiler: Compiler) {
     const { mainTemplate } = compilation;
 
     // @ts-ignore
-    mainTemplate.hooks.assetPath.tap('GitRevPlugin', path => {
-      return path
+    mainTemplate.hooks.assetPath.tap('GitRevPlugin', (path, data) => {
+      const content = typeof path === 'function' ? path(data) : path;
+
+      return content
         .replace(REGEXP_BRANCH, currentBranch)
         .replace(REGEXP_HASH, currentHash)
         .replace(REGEXP_TAG, currentTag);
