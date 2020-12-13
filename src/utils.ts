@@ -1,26 +1,13 @@
 import { execSync } from 'child_process';
 
-export interface IOptions {
-  path?: string;
-  branchCommand?: string;
-  hashCommand?: string;
-  tagCommand?: string;
-}
-
-export interface IVariables {
-  path?: string;
-  branchCommand: string;
-  hashCommand: string;
-  tagCommand: string;
-}
-
-interface IExecOptions {
+interface ExecOptions {
   cwd?: string;
+  stdio?: ['pipe', 'pipe', 'ignore'];
 }
 
-export function runGit(cwd: string | undefined, command: string) {
+export function runGit(cwd: string | undefined, command: string): string {
   const gitCommand = ['git', command].join(' ');
-  const execOptions: IExecOptions = {};
+  const execOptions: ExecOptions = { stdio: ['pipe', 'pipe', 'ignore'] };
 
   /* istanbul ignore else */
   if (cwd) {
@@ -33,8 +20,12 @@ export function runGit(cwd: string | undefined, command: string) {
 
     return output.toString().replace(/[\s\r\n]+$/, '');
   } catch (error) {
-    // tslint:disable-next-line:no-console
-    console.log('GitRevPlugin: project is not under git');
+    /* istanbul ignore else */
+    if (error?.toString().indexOf('is-inside-work-tree') >= 0) {
+      // eslint-disable-next-line no-console
+      console.log('GitRevPlugin: project is not under git');
+    }
+
     return '';
   }
 }
