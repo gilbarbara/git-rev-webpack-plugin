@@ -15,7 +15,6 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name]-[git-hash].css',
       chunkFilename: '[id]-[git-hash].css',
-      ignoreOrder: false,
     }),
   ],
   module: {
@@ -30,10 +29,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              // you can specify a publicPath here
-              // by default it uses publicPath in webpackOptions.output
               publicPath: '../',
-              hmr: process.env.NODE_ENV === 'development',
             },
           },
           'css-loader',
