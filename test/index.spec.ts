@@ -1,10 +1,4 @@
-/* tslint:disable:no-console */
-import { readFileSync } from 'fs';
-import { copySync } from 'fs-extra/lib/copy-sync';
-import { emptyDirSync } from 'fs-extra/lib/empty';
-import { pathExistsSync } from 'fs-extra/lib/path-exists';
-import { removeSync } from 'fs-extra/lib/remove';
-
+import { copySync, emptyDirSync, pathExistsSync, readFileSync, removeSync } from 'fs-extra';
 import { join } from 'path';
 import webpack from 'webpack';
 
@@ -29,7 +23,7 @@ describe('GitRevPlugin', () => {
     removeSync(targetBuild);
   });
 
-  it('should handle methods', () => {
+  it('should return the correct data', () => {
     const gitRevPlugin = new GitRevPlugin({ path: targetProject });
 
     expect(gitRevPlugin.branch()).toBe('master');
@@ -53,21 +47,19 @@ describe('GitRevPlugin', () => {
   });
 
   it('should handle webpack compilation', done => {
-    // eslint-disable-next-line global-require,import/no-dynamic-require
     const config = require(`${targetProjectConfig}`);
 
     config.context = targetProject;
     config.output.path = targetBuild;
-    config.plugins = [
+    config.plugins = config.plugins.concat([
       new GitRevPlugin({
         path: targetProject,
       }),
-    ].concat(config.plugins);
+    ]);
 
-    webpack(config, (error: Error, stats: webpack.Stats) => {
-      // Stats Object
-      if (error || stats.hasErrors()) {
-        console.log(error);
+    webpack(config, (error, stats) => {
+      if (error || stats?.hasErrors()) {
+        done.fail(`Webpack failed:  ${error}`);
       }
 
       const html = readFileSync(join(targetBuild, 'index.html'), 'utf8');
